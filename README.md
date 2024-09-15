@@ -1,1 +1,1 @@
-## This App was built for academic purposes during my Intership.
+This App was built for academic purposes during my Intership.
