@@ -3,11 +3,21 @@
 #include <cstring>
 #include <fstream>
 #include <iomanip>
-#include "helperFunctions.h"
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <cstdio>
+#include "ScreenFunctions.h"
 
 using namespace std;
 
-int main(void);
+void buildMenu();
+
+struct winsize getTerminalSize()
+{
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w;
+}
 
 char atendimento[31][10][50];     // Esta e a variavel responsavel por armazenar todos os nomes, dias e horas
 int controla_leitura_arquivo = 0; // Como o proprio nome diz, esta variavel controla a leitura do arquivo, para que ocorra apenas ao iniciar
@@ -19,6 +29,7 @@ void marca_atendimento(int dia, int hora, char nome[50]) // Procedimento utiliza
     int i = 0;
     while (*pnome)
     {
+        std::cout << *pnome;
         atendimento[dia][hora][i] = *pnome;
         pnome++;
         i++;
@@ -62,11 +73,11 @@ void abre_atendimento() // Procedimento responsavel por abrir a pagina para marc
 {
     char dia[2], hora[2], nome[50];
     int dia_inteiro;
-    HelperFunctions funcoes;
+    ScreenFunctions funcoes;
     funcoes.clearScreen();
     funcoes.moveCursor(1, 1);
     cout << endl;
-    cout << "                                    *** AGENDA PARA MARCA��O DE ATENDIMENTO ***                                    ";
+    cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     cout << endl
          << endl;
     cout << "                                                 MARCAR ATENDIMENTO                                    ";
@@ -88,7 +99,7 @@ void abre_atendimento() // Procedimento responsavel por abrir a pagina para marc
              << endl
              << endl
              << endl
-             << " Dia inv�lido.";
+             << " Dia inválido.";
         cout << endl
              << " Pressione <Enter> para nova tentativa.";
         if (cin.get())
@@ -115,7 +126,7 @@ void abre_atendimento() // Procedimento responsavel por abrir a pagina para marc
              << endl
              << endl
              << endl
-             << " Hora inv�lida.";
+             << " Hora inválida.";
         cout << endl
              << " Pressione <Enter> para nova tentativa.";
         if (cin.get())
@@ -132,7 +143,7 @@ void abre_atendimento() // Procedimento responsavel por abrir a pagina para marc
         cout << endl
              << "Tecle <Enter> para voltar ao menu.";
         cin.get();
-        main();
+        buildMenu();
     }
     else
     {
@@ -148,7 +159,7 @@ void abre_atendimento() // Procedimento responsavel por abrir a pagina para marc
         cout << " Tecle <Enter> para voltar ao menu.";
         marca_atendimento(dia_inteiro - 1, hora_inteiro - 8, nome);
         if (cin.get())
-            main();
+            buildMenu();
     }
 }
 
@@ -156,11 +167,11 @@ void abre_desmarcacao() // Procedimento responsavel por abrir pagina para desmar
 {
     char dia[2], hora[2];
     int dia_inteiro;
-    HelperFunctions funcoes;
+    ScreenFunctions funcoes;
     funcoes.clearScreen();
     funcoes.moveCursor(1, 1);
     cout << endl;
-    cout << "                                    *** AGENDA PARA DESMARCA��O DE ATENDIMENTO ***                                    ";
+    cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     cout << endl
          << endl;
     cout << "                                                 DESMARCAR ATENDIMENTO                                    ";
@@ -182,7 +193,7 @@ void abre_desmarcacao() // Procedimento responsavel por abrir pagina para desmar
              << endl
              << endl
              << endl
-             << " Dia inv�lido.";
+             << " Dia inválido.";
         cout << endl
              << " Pressione <Enter> para nova tentativa.";
         if (cin.get())
@@ -209,7 +220,7 @@ void abre_desmarcacao() // Procedimento responsavel por abrir pagina para desmar
              << endl
              << endl
              << endl
-             << " Hora inv�lida.";
+             << " Hora inválida.";
         cout << endl
              << " Pressione <Enter> para nova tentativa.";
         if (cin.get())
@@ -232,7 +243,7 @@ void abre_desmarcacao() // Procedimento responsavel por abrir pagina para desmar
         {
             strcpy(atendimento[dia_inteiro - 1][hora_inteiro - 8], "");
         }
-        main();
+        buildMenu();
     }
     else
     {
@@ -242,22 +253,22 @@ void abre_desmarcacao() // Procedimento responsavel por abrir pagina para desmar
              << endl
              << endl
              << endl
-             << " Hor�rio livre.";
+             << " Horário livre.";
         cout << endl
              << " Pressione <Enter> para voltar.";
         if (cin.get())
-            main();
+            buildMenu();
     }
 }
 void lista_cliente() // Procedimento responsavel por mostrar clientes em determinado horario
 {
     char dia[2];
     char *pcliente = 0;
-    HelperFunctions funcoes;
+    ScreenFunctions funcoes;
     funcoes.clearScreen();
     funcoes.moveCursor(1, 1);
     cout << endl;
-    cout << "                                    *** AGENDA PARA MARCA��O DE ATENDIMENTO ***                                    ";
+    cout << "                                    *** AGENDA PARA MARCAÇÃO DE ATENDIMENTO ***                                    ";
     cout << endl
          << endl;
     cout << "                                                   CLIENTES DO DIA                                    ";
@@ -278,7 +289,7 @@ void lista_cliente() // Procedimento responsavel por mostrar clientes em determi
              << endl
              << endl
              << endl
-             << " Dia inv�lido.";
+             << " Dia inválido.";
         cout << endl
              << " Pressione <Enter> para nova tentativa.";
         if (cin.get())
@@ -311,19 +322,19 @@ void lista_cliente() // Procedimento responsavel por mostrar clientes em determi
          << endl
          << " Tecle <Enter> para voltar ao menu.";
     if (cin.get())
-        main();
+        buildMenu();
 }
 void horarios_cliente() // Procedimento responsavel por mostrar os horarios de cada cliente solicitado pelo usuario
 {
-    HelperFunctions funcoes;
+    ScreenFunctions funcoes;
     funcoes.clearScreen();
     funcoes.moveCursor(1, 1);
     char nome[50];
     cout << endl;
-    cout << "                                    *** AGENDA PARA MARCA��O DE ATENDIMENTO ***                                    ";
+    cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     cout << endl
          << endl;
-    cout << "                                                HOR�RIOS DE UM CLIENTE                                    ";
+    cout << "                                                HORÁRIOS DE UM CLIENTE                                    ";
     cout << endl
          << endl
          << endl;
@@ -331,14 +342,14 @@ void horarios_cliente() // Procedimento responsavel por mostrar os horarios de c
     cin.getline(nome, sizeof(nome));
     cout << endl
          << endl;
-    cout << " Hor�rio para o cliente " << nome << endl;
+    cout << " Horário para o cliente " << nome << endl;
     setiosflags(ios::right);
     for (int i = 0; i <= 30; i++)
         for (int j = 8; j <= 17; j++)
         {
             {
                 if (strcmp(nome, atendimento[i][j - 8]) == 0)
-                    cout << " DIA " << setw(2) << i + 1 << " �S " << setw(2)
+                    cout << " DIA " << setw(2) << i + 1 << " ÀS " << setw(2)
                          << j << " HORAS" << endl;
             }
         }
@@ -347,19 +358,19 @@ void horarios_cliente() // Procedimento responsavel por mostrar os horarios de c
          << endl
          << " Tecle <Enter> para voltar ao menu.";
     if (cin.get())
-        main();
+        buildMenu();
 }
 void mapa_horarios() // Mapa que identifica os horarios ocupados e disponiveis no tempo em que a agenda esta disponivel
 {
 
-    HelperFunctions funcoes;
+    ScreenFunctions funcoes;
     funcoes.clearScreen();
     funcoes.moveCursor(1, 1);
     cout << endl;
-    cout << "                                    *** AGENDA PARA MARCA��O DE ATENDIMENTO ***                                    ";
+    cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     cout << endl
          << endl;
-    cout << "                                             MAPA DOS HOR�RIOS OCUPADOS                                    ";
+    cout << "                                             MAPA DOS HORÁRIOS OCUPADOS                                    ";
     cout << endl
          << endl
          << endl;
@@ -401,56 +412,44 @@ void mapa_horarios() // Mapa que identifica os horarios ocupados e disponiveis n
          << endl
          << " Tecle <Enter> para voltar ao menu.";
     if (cin.get())
-        main();
+        buildMenu();
 }
+
 void escrevearquivo() // Procedimento que escreve os dados no arquivo
 {
-    fstream arquivo("../ARQUIVO.LUCAS", ios::out | ios::binary);
+    fstream arquivo("../ARQUIVO.AGENDAMENTOS", ios::out | ios::binary);
     arquivo.write(reinterpret_cast<char *>(&atendimento), sizeof(atendimento));
     arquivo.close();
 }
-int main(void) // Funcao principal
+
+void buildMenu()
 {
-    if (controla_leitura_arquivo == 0)
-    {
-        fstream arquivo("../ARQUIVO.LUCAS", ios::in | ios::binary);
-        if (arquivo.good())
-        {
-            arquivo.read(reinterpret_cast<char *>(&atendimento), sizeof(atendimento));
-            controla_leitura_arquivo = 1;
-        }
-        else
-        {
-            arquivo.open("../ARQUIVO.LUCAS", ios::out | ios::binary);
-            controla_leitura_arquivo = 1;
-        }
-    }
     char option[2];
-    HelperFunctions funcoes;
+    ScreenFunctions funcoes;
     funcoes.clearScreen();
     funcoes.moveCursor(1, 1);
-    setlocale(LC_ALL, "Portuguese_Brazil.1252");
-    cout << endl;
-    cout << "                                    *** AGENDA PARA MARCA��O DE ATENDIMENTO ***                                    ";
-    cout << endl
-         << endl;
-    cout << "                                                   MENU PRINCIPAL                                    ";
-    cout << endl
-         << endl
-         << endl;
-    cout << "                                          [1] MARCAR ATENDIMENTO" << endl;
-    cout << "                                          [2] DESMARCAR ATENDIMENTO" << endl;
-    cout << "                                          [3] LISTAR MARCA��ES DO DIA" << endl;
-    cout << "                                          [4] CLIENTES MARCADOS NO DIA" << endl;
-    cout << "                                          [5] MAPA DOS HOR�RIOS LIVRES" << endl;
-    cout << "                                          [6] FIM DO PROGRAMA" << endl
-         << endl;
-    cout << "                                          ==> ";
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+    std::cout << std::endl;
+    std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
+    std::cout << std::endl
+              << std::endl;
+    std::cout << "                                                   MENU PRINCIPAL                                    ";
+    std::cout << std::endl
+              << std::endl
+              << std::endl;
+    std::cout << "                                          [1] MARCAR ATENDIMENTO" << std::endl;
+    std::cout << "                                          [2] DESMARCAR ATENDIMENTO" << std::endl;
+    std::cout << "                                          [3] LISTAR MARCAÇÕES DO DIA" << std::endl;
+    std::cout << "                                          [4] CLIENTES MARCADOS NO DIA" << std::endl;
+    std::cout << "                                          [5] MAPA DOS HORÁRIOS LIVRES" << std::endl;
+    std::cout << "                                          [6] FIM DO PROGRAMA" << std::endl
+              << std::endl;
+    std::cout << "                                          ==> ";
 
     do
     {
-        cin >> option;
-        cin.ignore(80, '\n');
+        std::cin >> option;
+        std::cin.ignore(80, '\n');
         switch (atoi(option))
         {
         case 1:
@@ -472,10 +471,28 @@ int main(void) // Funcao principal
             escrevearquivo();
             exit(0);
         default:
-            funcoes.clearLine(47, 14);
-            funcoes.moveCursor(47, 14);
+            struct winsize w = getTerminalSize();
+            int line = (w.ws_row / 2) + 3;
+            int column = (w.ws_col / 2) - 9;
+            funcoes.clearLine(line, column);
+            funcoes.moveCursor(line, column);
         }
     } while (atoi(option) != 6);
+}
+
+int main(void) // Funcao principal
+{
+    fstream arquivo("../ARQUIVO.AGENDAMENTOS", ios::in | ios::binary);
+    if (arquivo.good())
+    {
+        arquivo.read(reinterpret_cast<char *>(&atendimento), sizeof(atendimento));
+    }
+    else
+    {
+        arquivo.open("../ARQUIVO.AGENDAMENTOS", ios::out | ios::binary);
+    }
+
+    buildMenu();
 
     return 0;
 }

@@ -1,18 +1,18 @@
-#include "helperFunctions.h"
+#include "ScreenFunctions.h"
 #include <iostream>
 
-void HelperFunctions::clearScreen()
+void ScreenFunctions::clearScreen()
 {
-    std::cout << "\033[2J\033[H"; // ANSI escape code to clear screen and move cursor to home position
+    std::cout << "\033[2J\033[3J\033[H"; // Clear screen, clear scrollback buffer, move cursor to home position
 }
 
-void HelperFunctions::clearLine(int line, int column)
+void ScreenFunctions::clearLine(int line, int column)
 {
     std::cout << "\033[" << line << ";" << column << "H"; // Move cursor to specified position
     std::cout << "\033[K";                                // Clear line from cursor to end
 }
 
-void HelperFunctions::moveCursor(int line, int column)
+void ScreenFunctions::moveCursor(int line, int column)
 {
     std::cout << "\033[" << line << ";" << column << "H"; // Move cursor to specified position
 }
