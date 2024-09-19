@@ -1,7 +1,7 @@
 #include "Schedule.h"
 #include <iostream>
 
-char Schedule::atendimento[31][10][50] = {};
+std::unique_ptr<Core> Schedule::core = std::make_unique<Core>();
 
 void Schedule::marca_atendimento(const int dia, const int hora, const char nome[50])
 {
@@ -11,7 +11,7 @@ void Schedule::marca_atendimento(const int dia, const int hora, const char nome[
     while (*pnome)
     {
         std::cout << *pnome;
-        atendimento[dia][hora][i] = *pnome;
+        core->atendimento[dia][hora][i] = *pnome;
         pnome++;
         i++;
     }
@@ -20,7 +20,7 @@ void Schedule::marca_atendimento(const int dia, const int hora, const char nome[
 bool Schedule::horario_ocupado(int dia, int hora)
 {
     char *pcliente = 0;
-    pcliente = atendimento[dia][hora];
+    pcliente = core->atendimento[dia][hora];
     if (*pcliente)
     {
         std::cout << std::endl
@@ -46,7 +46,7 @@ bool Schedule::horario_ocupado(int dia, int hora)
 bool Schedule::mapa_ocupado(int dia, int hora)
 {
     char *ocupado = 0;
-    ocupado = atendimento[dia][hora];
+    ocupado = core->atendimento[dia][hora];
     if (*ocupado)
         return true;
     else
@@ -225,7 +225,7 @@ void Schedule::abre_desmarcacao(Screen &functions,
         resp = toupper(resp);
         if (resp == 'S')
         {
-            strcpy(atendimento[dia_inteiro - 1][hora_inteiro - 8], "");
+            strcpy(core->atendimento[dia_inteiro - 1][hora_inteiro - 8], "");
         }
         buildMenu();
     }
@@ -291,7 +291,7 @@ void Schedule::lista_cliente(Screen &functions,
     std::cout << std::setiosflags(std::ios::right);
     for (int i = 8; i <= 17; i++)
     {
-        pcliente = atendimento[dia_inteiro - 1][i - 8];
+        pcliente = core->atendimento[dia_inteiro - 1][i - 8];
         std::cout << " ";
         std::cout << std::setw(2) << i;
         std::cout << " HORAS   ";
@@ -334,7 +334,7 @@ void Schedule::horarios_cliente(Screen &functions,
         for (int j = 8; j <= 17; j++)
         {
             {
-                if (strcmp(nome, atendimento[i][j - 8]) == 0)
+                if (strcmp(nome, core->atendimento[i][j - 8]) == 0)
                     std::cout << " DIA " << std::setw(2) << i + 1 << " ÀS " << std::setw(2)
                               << j << " HORAS" << std::endl;
             }
@@ -399,11 +399,4 @@ void Schedule::mapa_horarios(Screen &functions,
               << " Tecle <Enter> para voltar ao menu.";
     if (std::cin.get())
         buildMenu();
-}
-
-void Schedule::escrevearquivo()
-{
-    std::fstream arquivo("../ARQUIVO.AGENDAMENTOS", std::ios::out | std::ios::binary);
-    arquivo.write(reinterpret_cast<char *>(&atendimento), sizeof(atendimento));
-    arquivo.close();
 }

@@ -8,6 +8,8 @@
 #include "Schedule.h"
 
 void buildMenu();
+Screen screen;
+Schedule schedule;
 
 struct winsize getTerminalSize()
 {
@@ -18,11 +20,9 @@ struct winsize getTerminalSize()
 
 void buildMenu()
 {
-    Screen functions;
-    Schedule schedule;
     char option[2];
-    functions.clearScreen();
-    functions.moveCursor(1, 1);
+    screen.clearScreen();
+    screen.moveCursor(1, 1);
     setlocale(LC_ALL, "pt_BR.UTF-8");
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
@@ -49,55 +49,45 @@ void buildMenu()
         {
         case 1:
             schedule.abre_atendimento(
-                functions, []()
+                screen, []()
                 { buildMenu(); });
             break;
         case 2:
             schedule.abre_desmarcacao(
-                functions, []()
+                screen, []()
                 { buildMenu(); });
             break;
         case 3:
             schedule.lista_cliente(
-                functions, []()
+                screen, []()
                 { buildMenu(); });
             break;
         case 4:
             schedule.horarios_cliente(
-                functions, []()
+                screen, []()
                 { buildMenu(); });
             break;
         case 5:
             schedule.mapa_horarios(
-                functions, []()
+                screen, []()
                 { buildMenu(); });
             break;
         case 6:
-            schedule.escrevearquivo();
             exit(0);
         default:
             struct winsize w = getTerminalSize();
             int line = (w.ws_row / 2) + 3;
             int column = (w.ws_col / 2) - 9;
-            functions.clearLine(line, column);
-            functions.moveCursor(line, column);
+            screen.clearLine(line, column);
+            screen.moveCursor(line, column);
         }
     } while (atoi(option) != 6);
 }
 
 int main(void) // Funcao principal
 {
-    Schedule schedule;
-    std::fstream arquivo("../ARQUIVO.AGENDAMENTOS", std::ios::in | std::ios::binary);
-    if (arquivo.good())
-    {
-        arquivo.read(reinterpret_cast<char *>(&schedule.atendimento), sizeof(schedule.atendimento));
-    }
-    else
-    {
-        arquivo.open("../ARQUIVO.AGENDAMENTOS", std::ios::out | std::ios::binary);
-    }
-
+    screen = Screen();
+    schedule = Schedule();
     buildMenu();
 
     return 0;
