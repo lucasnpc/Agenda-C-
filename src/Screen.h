@@ -1,7 +1,7 @@
-#ifndef SCREENFUNCTIONS_H
-#define SCREENFUNCTIONS_H
+#ifndef SCREEN_H
+#define SCREEN_H
 
-class ScreenFunctions
+class Screen
 {
 public:
     void clearScreen();

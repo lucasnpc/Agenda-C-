@@ -53,7 +53,7 @@ bool Schedule::mapa_ocupado(int dia, int hora)
         return false;
 }
 
-void Schedule::abre_atendimento(ScreenFunctions &functions,
+void Schedule::abre_atendimento(Screen &functions,
                                 std::function<void()> buildMenu)
 {
     char dia[2], hora[2], nome[50];
@@ -147,7 +147,7 @@ void Schedule::abre_atendimento(ScreenFunctions &functions,
     }
 }
 
-void Schedule::abre_desmarcacao(ScreenFunctions &functions,
+void Schedule::abre_desmarcacao(Screen &functions,
                                 std::function<void()> buildMenu)
 {
     char dia[2], hora[2];
@@ -245,7 +245,7 @@ void Schedule::abre_desmarcacao(ScreenFunctions &functions,
     }
 }
 
-void Schedule::lista_cliente(ScreenFunctions &functions,
+void Schedule::lista_cliente(Screen &functions,
                              std::function<void()> buildMenu)
 {
     char dia[2];
@@ -310,7 +310,7 @@ void Schedule::lista_cliente(ScreenFunctions &functions,
         buildMenu();
 }
 
-void Schedule::horarios_cliente(ScreenFunctions &functions,
+void Schedule::horarios_cliente(Screen &functions,
                                 std::function<void()> buildMenu)
 {
     functions.clearScreen();
@@ -347,7 +347,7 @@ void Schedule::horarios_cliente(ScreenFunctions &functions,
         buildMenu();
 }
 
-void Schedule::mapa_horarios(ScreenFunctions &functions,
+void Schedule::mapa_horarios(Screen &functions,
                              std::function<void()> buildMenu)
 {
     functions.clearScreen();

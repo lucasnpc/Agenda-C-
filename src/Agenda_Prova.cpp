@@ -4,7 +4,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <cstdio>
-#include "ScreenFunctions.h"
+#include "Screen.h"
 #include "Schedule.h"
 
 void buildMenu();
@@ -18,7 +18,7 @@ struct winsize getTerminalSize()
 
 void buildMenu()
 {
-    ScreenFunctions functions;
+    Screen functions;
     Schedule schedule;
     char option[2];
     functions.clearScreen();
