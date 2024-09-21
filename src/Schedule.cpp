@@ -10,7 +10,6 @@ void Schedule::marca_atendimento(const int dia, const int hora, const char nome[
     int i = 0;
     while (*pnome)
     {
-        std::cout << *pnome;
         core->atendimento[dia][hora][i] = *pnome;
         pnome++;
         i++;
@@ -53,13 +52,12 @@ bool Schedule::mapa_ocupado(int dia, int hora)
         return false;
 }
 
-void Schedule::abre_atendimento(Screen &functions,
-                                std::function<void()> buildMenu)
+void Schedule::abre_atendimento(Screen &screen)
 {
     char dia[2], hora[2], nome[50];
     int dia_inteiro;
-    functions.clearScreen();
-    functions.moveCursor(1, 1);
+    screen.clearScreen();
+    screen.moveCursor(1, 1);
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     std::cout << std::endl
@@ -88,10 +86,10 @@ void Schedule::abre_atendimento(Screen &functions,
                   << " Pressione <Enter> para nova tentativa.";
         if (std::cin.get())
         {
-            functions.moveCursor(23, 7);
-            functions.clearLine(23, 7);
-            functions.clearLine(1, 14);
-            functions.clearLine(1, 15);
+            screen.moveCursor(23, 7);
+            screen.clearLine(23, 7);
+            screen.clearLine(1, 14);
+            screen.clearLine(1, 15);
         }
     } while (atoi(dia) < 1 || atoi(dia) > 31);
     dia_inteiro = atoi(dia);
@@ -115,10 +113,10 @@ void Schedule::abre_atendimento(Screen &functions,
                   << " Pressione <Enter> para nova tentativa.";
         if (std::cin.get())
         {
-            functions.moveCursor(23, 8);
-            functions.clearLine(23, 8);
-            functions.clearLine(1, 15);
-            functions.clearLine(1, 16);
+            screen.moveCursor(23, 8);
+            screen.clearLine(23, 8);
+            screen.clearLine(1, 15);
+            screen.clearLine(1, 16);
         }
     } while (atoi(hora) < 8 || atoi(hora) > 17);
     int hora_inteiro = atoi(hora);
@@ -127,7 +125,6 @@ void Schedule::abre_atendimento(Screen &functions,
         std::cout << std::endl
                   << "Tecle <Enter> para voltar ao menu.";
         std::cin.get();
-        buildMenu();
     }
     else
     {
@@ -142,18 +139,16 @@ void Schedule::abre_atendimento(Screen &functions,
                   << " SUCESSO, REGISTRO ADICIONADO." << std::endl;
         std::cout << " Tecle <Enter> para voltar ao menu.";
         marca_atendimento(dia_inteiro - 1, hora_inteiro - 8, nome);
-        if (std::cin.get())
-            buildMenu();
+        std::cin.get();
     }
 }
 
-void Schedule::abre_desmarcacao(Screen &functions,
-                                std::function<void()> buildMenu)
+void Schedule::abre_desmarcacao(Screen &screen)
 {
     char dia[2], hora[2];
     int dia_inteiro;
-    functions.clearScreen();
-    functions.moveCursor(1, 1);
+    screen.clearScreen();
+    screen.moveCursor(1, 1);
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     std::cout << std::endl
@@ -182,10 +177,10 @@ void Schedule::abre_desmarcacao(Screen &functions,
                   << " Pressione <Enter> para nova tentativa.";
         if (std::cin.get())
         {
-            functions.moveCursor(23, 7);
-            functions.clearLine(23, 7);
-            functions.clearLine(1, 14);
-            functions.clearLine(1, 15);
+            screen.moveCursor(23, 7);
+            screen.clearLine(23, 7);
+            screen.clearLine(1, 14);
+            screen.clearLine(1, 15);
         }
     } while (atoi(dia) < 1 || atoi(dia) > 31);
     dia_inteiro = atoi(dia);
@@ -209,10 +204,10 @@ void Schedule::abre_desmarcacao(Screen &functions,
                   << " Pressione <Enter> para nova tentativa.";
         if (std::cin.get())
         {
-            functions.moveCursor(23, 8);
-            functions.clearLine(23, 8);
-            functions.clearLine(1, 15);
-            functions.clearLine(1, 16);
+            screen.moveCursor(23, 8);
+            screen.clearLine(23, 8);
+            screen.clearLine(1, 15);
+            screen.clearLine(1, 16);
         }
     } while (atoi(hora) < 8 || atoi(hora) > 17);
     int hora_inteiro = atoi(hora);
@@ -227,7 +222,6 @@ void Schedule::abre_desmarcacao(Screen &functions,
         {
             strcpy(core->atendimento[dia_inteiro - 1][hora_inteiro - 8], "");
         }
-        buildMenu();
     }
     else
     {
@@ -240,18 +234,16 @@ void Schedule::abre_desmarcacao(Screen &functions,
                   << " Horário livre.";
         std::cout << std::endl
                   << " Pressione <Enter> para voltar.";
-        if (std::cin.get())
-            buildMenu();
+        std::cin.get();
     }
 }
 
-void Schedule::lista_cliente(Screen &functions,
-                             std::function<void()> buildMenu)
+void Schedule::lista_cliente(Screen &screen)
 {
     char dia[2];
     char *pcliente = 0;
-    functions.clearScreen();
-    functions.moveCursor(1, 1);
+    screen.clearScreen();
+    screen.moveCursor(1, 1);
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA MARCAÇÃO DE ATENDIMENTO ***                                    ";
     std::cout << std::endl
@@ -279,10 +271,10 @@ void Schedule::lista_cliente(Screen &functions,
                   << " Pressione <Enter> para nova tentativa.";
         if (std::cin.get())
         {
-            functions.moveCursor(17, 6);
-            functions.clearLine(16, 6);
-            functions.clearLine(1, 13);
-            functions.clearLine(1, 14);
+            screen.moveCursor(17, 6);
+            screen.clearLine(16, 6);
+            screen.clearLine(1, 13);
+            screen.clearLine(1, 14);
         }
     } while (atoi(dia) < 1 || atoi(dia) > 31);
     int dia_inteiro = atoi(dia);
@@ -306,15 +298,13 @@ void Schedule::lista_cliente(Screen &functions,
     std::cout << std::endl
               << std::endl
               << " Tecle <Enter> para voltar ao menu.";
-    if (std::cin.get())
-        buildMenu();
+    std::cin.get();
 }
 
-void Schedule::horarios_cliente(Screen &functions,
-                                std::function<void()> buildMenu)
+void Schedule::horarios_cliente(Screen &screen)
 {
-    functions.clearScreen();
-    functions.moveCursor(1, 1);
+    screen.clearScreen();
+    screen.moveCursor(1, 1);
     char nome[50];
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
@@ -343,15 +333,13 @@ void Schedule::horarios_cliente(Screen &functions,
               << std::endl
               << std::endl
               << " Tecle <Enter> para voltar ao menu.";
-    if (std::cin.get())
-        buildMenu();
+    std::cin.get();
 }
 
-void Schedule::mapa_horarios(Screen &functions,
-                             std::function<void()> buildMenu)
+void Schedule::mapa_horarios(Screen &screen)
 {
-    functions.clearScreen();
-    functions.moveCursor(1, 1);
+    screen.clearScreen();
+    screen.moveCursor(1, 1);
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
     std::cout << std::endl
@@ -366,7 +354,7 @@ void Schedule::mapa_horarios(Screen &functions,
     std::cout << std::setiosflags(std::ios::right);
     for (int i = 8; i <= 17; i++)
     {
-        functions.moveCursor(42, linha);
+        screen.moveCursor(42, linha);
         std::cout << std::setw(2) << i << std::endl;
         linha++;
     }
@@ -378,13 +366,13 @@ void Schedule::mapa_horarios(Screen &functions,
         {
             if (not mapa_ocupado(j, i))
             {
-                functions.moveCursor(coluna, linha);
+                screen.moveCursor(coluna, linha);
                 std::cout << ".";
                 coluna++;
             }
             else
             {
-                functions.moveCursor(coluna, linha);
+                screen.moveCursor(coluna, linha);
                 std::cout << "*";
                 coluna++;
             }
@@ -397,6 +385,5 @@ void Schedule::mapa_horarios(Screen &functions,
               << std::endl
               << std::endl
               << " Tecle <Enter> para voltar ao menu.";
-    if (std::cin.get())
-        buildMenu();
+    std::cin.get();
 }

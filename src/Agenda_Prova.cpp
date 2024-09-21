@@ -1,15 +1,10 @@
 #include <iostream>
-#include <clocale>
-#include <cstring>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <cstdio>
 #include "Screen.h"
 #include "Schedule.h"
-
-void buildMenu();
-Screen screen;
-Schedule schedule;
+#include "Menu.h"
 
 struct winsize getTerminalSize()
 {
@@ -18,59 +13,35 @@ struct winsize getTerminalSize()
     return w;
 }
 
-void buildMenu()
+int main(void) // Funcao principal
 {
+    Screen screen;
+    Schedule schedule;
+    Menu menu;
+
     char option[2];
-    screen.clearScreen();
-    screen.moveCursor(1, 1);
-    setlocale(LC_ALL, "pt_BR.UTF-8");
-    std::cout << std::endl;
-    std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
-    std::cout << std::endl
-              << std::endl;
-    std::cout << "                                                   MENU PRINCIPAL                                    ";
-    std::cout << std::endl
-              << std::endl
-              << std::endl;
-    std::cout << "                                          [1] MARCAR ATENDIMENTO" << std::endl;
-    std::cout << "                                          [2] DESMARCAR ATENDIMENTO" << std::endl;
-    std::cout << "                                          [3] LISTAR MARCAÇÕES DO DIA" << std::endl;
-    std::cout << "                                          [4] CLIENTES MARCADOS NO DIA" << std::endl;
-    std::cout << "                                          [5] MAPA DOS HORÁRIOS LIVRES" << std::endl;
-    std::cout << "                                          [6] FIM DO PROGRAMA" << std::endl
-              << std::endl;
-    std::cout << "                                          ==> ";
 
     do
     {
+        menu.renderMenu(screen);
         std::cin >> option;
         std::cin.ignore(80, '\n');
         switch (atoi(option))
         {
         case 1:
-            schedule.abre_atendimento(
-                screen, []()
-                { buildMenu(); });
+            schedule.abre_atendimento(screen);
             break;
         case 2:
-            schedule.abre_desmarcacao(
-                screen, []()
-                { buildMenu(); });
+            schedule.abre_desmarcacao(screen);
             break;
         case 3:
-            schedule.lista_cliente(
-                screen, []()
-                { buildMenu(); });
+            schedule.lista_cliente(screen);
             break;
         case 4:
-            schedule.horarios_cliente(
-                screen, []()
-                { buildMenu(); });
+            schedule.horarios_cliente(screen);
             break;
         case 5:
-            schedule.mapa_horarios(
-                screen, []()
-                { buildMenu(); });
+            schedule.mapa_horarios(screen);
             break;
         case 6:
             exit(0);
@@ -82,13 +53,6 @@ void buildMenu()
             screen.moveCursor(line, column);
         }
     } while (atoi(option) != 6);
-}
-
-int main(void) // Funcao principal
-{
-    screen = Screen();
-    schedule = Schedule();
-    buildMenu();
 
     return 0;
 }
