@@ -70,74 +70,77 @@ int main(void)
     initSDLAndTTF();
     auto sdl_window = initSDLWindow();
 
-    if (nullptr != sdl_window)
+    if (nullptr == sdl_window)
     {
-        auto sdl_renderer =
-            std::unique_ptr<SDL_Renderer, SDLRendererDeleter>(SDL_CreateRenderer(sdl_window.get(), -1, SDL_RENDERER_ACCELERATED));
-        if (nullptr == sdl_renderer)
-        {
-            std::cerr << "Renderer could not be created.\n";
-            std::cerr << "SDL_Error: " << SDL_GetError() << "\n";
-            SDL_Quit();
-        }
-
-        auto font = TTF_OpenFont("../fonts/AovelSansRounded-rdDL.ttf", 24);
-        if (!font)
-        {
-            std::cerr << "Font could not be loaded.\n";
-            std::cerr << "Failed to load font: " << TTF_GetError() << "\n";
-            SDL_Quit();
-        }
+        return 1;
     }
 
-    SDL_Event e;
-    bool running = true;
-    while (SDL_PollEvent(&e))
+    auto sdl_renderer =
+        std::unique_ptr<SDL_Renderer, SDLRendererDeleter>(SDL_CreateRenderer(sdl_window.get(), -1, SDL_RENDERER_ACCELERATED));
+    if (nullptr == sdl_renderer)
     {
-        if (e.type == SDL_QUIT)
-        {
-            SDL_Quit();
-        }
+        std::cerr << "Renderer could not be created.\n";
+        std::cerr << "SDL_Error: " << SDL_GetError() << "\n";
+        SDL_Quit();
+    }
+
+    auto font = TTF_OpenFont("../fonts/AovelSansRounded-rdDL.ttf", 24);
+    if (!font)
+    {
+        std::cerr << "Font could not be loaded.\n";
+        std::cerr << "Failed to load font: " << TTF_GetError() << "\n";
+        SDL_Quit();
     }
 
     Screen screen;
     Schedule schedule;
     Menu menu;
 
-    char option[2];
-
-    do
+    SDL_Event e;
+    bool running = true;
+    while (running)
     {
-        menu.renderMenu(screen);
-        std::cin >> option;
-        std::cin.ignore(80, '\n');
-        switch (atoi(option))
+        while (SDL_PollEvent(&e))
         {
-        case 1:
-            schedule.abre_atendimento(screen);
-            break;
-        case 2:
-            schedule.abre_desmarcacao(screen);
-            break;
-        case 3:
-            schedule.lista_cliente(screen);
-            break;
-        case 4:
-            schedule.horarios_cliente(screen);
-            break;
-        case 5:
-            schedule.mapa_horarios(screen);
-            break;
-        case 6:
-            exit(0);
-        default:
-            struct winsize w = getTerminalSize();
-            int line = (w.ws_row / 2) + 3;
-            int column = (w.ws_col / 2) - 9;
-            screen.clearLine(line, column);
-            screen.moveCursor(line, column);
+            if (e.type == SDL_QUIT)
+            {
+                running = false;
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_1:
+                    schedule.abre_atendimento(screen, sdl_renderer.get(), font);
+                    break;
+                case SDLK_2:
+                    schedule.abre_desmarcacao(screen, sdl_renderer.get(), font);
+                    break;
+                case SDLK_3:
+                    schedule.lista_cliente(screen, sdl_renderer.get(), font);
+                    break;
+                case SDLK_4:
+                    schedule.horarios_cliente(screen, sdl_renderer.get(), font);
+                    break;
+                case SDLK_5:
+                    schedule.mapa_horarios(screen, sdl_renderer.get(), font);
+                    break;
+                case SDLK_6:
+                    running = false;
+                    break;
+                default:
+                    break;
+                }
+            }
         }
-    } while (atoi(option) != 6);
+
+        // Render your menu here
+        menu.renderMenu(screen, sdl_renderer.get(), font);
+    }
+
+    TTF_CloseFont(font);
+    SDL_DestroyRenderer(sdl_renderer.get());
+    SDL_Quit();
 
     return 0;
 }
