@@ -16,32 +16,6 @@ void Schedule::marca_atendimento(const int dia, const int hora, const char nome[
     }
 }
 
-bool Schedule::horario_ocupado(int dia, int hora)
-{
-    char *pcliente = 0;
-    pcliente = core->atendimento[dia][hora];
-    if (*pcliente)
-    {
-        std::cout << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << "Horario ocupado por ";
-        while (*pcliente)
-        {
-            std::cout.put(*pcliente);
-            pcliente++;
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 bool Schedule::mapa_ocupado(int dia, int hora)
 {
     char *ocupado = 0;
@@ -52,102 +26,160 @@ bool Schedule::mapa_ocupado(int dia, int hora)
         return false;
 }
 
-void Schedule::abre_atendimento(Screen &screen)
+bool Schedule::horario_ocupado(int dia, int hora, SDL_Renderer *renderer, TTF_Font *font)
 {
-    char dia[2], hora[2], nome[50];
-    int dia_inteiro;
-    screen.clearScreen();
-    screen.moveCursor(1, 1);
-    std::cout << std::endl;
-    std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
-    std::cout << std::endl
-              << std::endl;
-    std::cout << "                                                 MARCAR ATENDIMENTO                                    ";
-    std::cout << std::endl
-              << std::endl
-              << std::endl;
-    std::cout << " INFORME O DIA .....: ";
-    do
+    SDL_Color white = {255, 255, 255, 255};
+
+    auto renderText = [&renderer, &font, &white](std::string text, int x, int y)
     {
-        std::cin >> dia;
-        std::cin.ignore(80, '\n');
-        if (atoi(dia) >= 1 && atoi(dia) <= 31)
-        {
-            break;
-        }
-        std::cout << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << " Dia inválido.";
-        std::cout << std::endl
-                  << " Pressione <Enter> para nova tentativa.";
-        if (std::cin.get())
-        {
-            screen.moveCursor(23, 7);
-            screen.clearLine(23, 7);
-            screen.clearLine(1, 14);
-            screen.clearLine(1, 15);
-        }
-    } while (atoi(dia) < 1 || atoi(dia) > 31);
-    dia_inteiro = atoi(dia);
-    std::cout << " INFORME A HORA ....: ";
-    do
+        SDL_Surface *surface = TTF_RenderText_Solid(font, text.c_str(), white);
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Rect dstrect = {x, y, surface->w, surface->h};
+        SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+        SDL_DestroyTexture(texture);
+        SDL_FreeSurface(surface);
+    };
+
+    char *pcliente = core->atendimento[dia][hora];
+    if (*pcliente)
     {
-        std::cin >> hora;
-        std::cin.ignore(80, '\n');
-        if (atoi(hora) >= 8 && atoi(hora) <= 17)
+        std::string message = "Horario ocupado por ";
+        while (*pcliente)
         {
-            break;
+            message += *pcliente;
+            pcliente++;
         }
-        std::cout << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << " Hora inválida.";
-        std::cout << std::endl
-                  << " Pressione <Enter> para nova tentativa.";
-        if (std::cin.get())
-        {
-            screen.moveCursor(23, 8);
-            screen.clearLine(23, 8);
-            screen.clearLine(1, 15);
-            screen.clearLine(1, 16);
-        }
-    } while (atoi(hora) < 8 || atoi(hora) > 17);
-    int hora_inteiro = atoi(hora);
-    if (horario_ocupado(dia_inteiro - 1, hora_inteiro - 8))
-    {
-        std::cout << std::endl
-                  << "Tecle <Enter> para voltar ao menu.";
-        std::cin.get();
+        renderText(message.c_str(), 50, 50); // Adjust x and y as needed
+        return true;
     }
     else
     {
-        std::cout << " INFORME A NOME ....: ";
-        std::cin.getline(nome, sizeof(nome));
-        std::cout << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << std::endl
-                  << " SUCESSO, REGISTRO ADICIONADO." << std::endl;
-        std::cout << " Tecle <Enter> para voltar ao menu.";
-        marca_atendimento(dia_inteiro - 1, hora_inteiro - 8, nome);
-        std::cin.get();
+        return false;
     }
 }
 
-void Schedule::abre_desmarcacao(Screen &screen)
+void Schedule::abre_atendimento(Screen &screen, SDL_Renderer *renderer, TTF_Font *font)
+{
+    SDL_Color white = {255, 255, 255, 255};
+
+    auto renderText = [&renderer, &font, &white](std::string text, int x, int y)
+    {
+        SDL_Surface *surface = TTF_RenderText_Solid(font, text.c_str(), white);
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Rect dstrect = {x, y, surface->w, surface->h};
+        SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+        SDL_DestroyTexture(texture);
+        SDL_FreeSurface(surface);
+    };
+
+    auto getInput = [](std::string input)
+    {
+        SDL_Event event;
+        bool done = false;
+        while (!done)
+        {
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    done = true;
+                    break;
+                }
+                else if (event.type == SDL_TEXTINPUT)
+                {
+                    input += event.text.text;
+                }
+                else if (event.type == SDL_KEYDOWN)
+                {
+                    if (event.key.keysym.sym == SDLK_RETURN)
+                    {
+                        done = true;
+                    }
+                    else if (event.key.keysym.sym == SDLK_BACKSPACE && !input.empty())
+                    {
+                        input.pop_back();
+                    }
+                }
+            }
+        }
+    };
+
+    std::string dia, hora, nome;
+    int dia_inteiro;
+
+    screen.clearScreen(renderer);
+    SDL_Delay(500);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    renderText("*** AGENDA PARA MARCAÇÃO DE ATENDIMENTO ***", 50, 50);
+    renderText("MARCAR ATENDIMENTO", 50, 100);
+    renderText("INFORME O DIA .....: ", 50, 150);
+    SDL_RenderPresent(renderer);
+
+    getInput(dia);
+    // SDL_RenderPresent(renderer);
+
+    // do
+    // {
+    //     getInput(dia);
+    //     dia_inteiro = std::stoi(dia);
+    //     if (dia_inteiro >= 1 && dia_inteiro <= 31)
+    //     {
+    //         break;
+    //     }
+    //     renderText("Dia inválido. Pressione <Enter> para nova tentativa.", 50, 200);
+    //     SDL_Event event;
+    //     while (SDL_WaitEvent(&event) && event.type != SDL_KEYDOWN)
+    //         ;
+    //     screen.clearLine(200, 50); // Clear the line where the error message was displayed
+    // } while (dia_inteiro < 1 || dia_inteiro > 31);
+
+    // renderText("INFORME A HORA ....: ", 50, 200);
+
+    // do
+    // {
+    //     getInput(hora);
+    //     int hora_inteiro = std::stoi(hora);
+    //     if (hora_inteiro >= 8 && hora_inteiro <= 17)
+    //     {
+    //         break;
+    //     }
+    //     renderText("Hora inválida. Pressione <Enter> para nova tentativa.", 50, 250);
+    //     SDL_Event event;
+    //     while (SDL_WaitEvent(&event) && event.type != SDL_KEYDOWN)
+    //         ;
+    //     screen.clearLine(250, 50); // Clear the line where the error message was displayed
+    // } while (atoi(hora.c_str()) < 8 || atoi(hora.c_str()) > 17);
+
+    // int hora_inteiro = std::stoi(hora);
+
+    // if (horario_ocupado(dia_inteiro - 1, hora_inteiro - 8, renderer, font))
+    // {
+    //     renderText("Tecle <Enter> para voltar ao menu.", 50, 300);
+    //     SDL_Event event;
+    //     while (SDL_WaitEvent(&event) && event.type != SDL_KEYDOWN)
+    //         ;
+    // }
+    // else
+    // {
+    //     renderText("INFORME A NOME ....: ", 50, 300);
+    //     getInput(nome);
+    //     renderText("SUCESSO, REGISTRO ADICIONADO.", 50, 350);
+    //     renderText("Tecle <Enter> para voltar ao menu.", 50, 400);
+    //     marca_atendimento(dia_inteiro - 1, hora_inteiro - 8, nome.c_str());
+    //     SDL_Event event;
+    //     while (SDL_WaitEvent(&event) && event.type != SDL_KEYDOWN)
+    //         ;
+    // }
+}
+
+void Schedule::abre_desmarcacao(Screen &screen, SDL_Renderer *renderer,
+                                TTF_Font *font)
 {
     char dia[2], hora[2];
     int dia_inteiro;
-    screen.clearScreen();
+    screen.clearScreen(renderer);
     screen.moveCursor(1, 1);
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
@@ -211,7 +243,7 @@ void Schedule::abre_desmarcacao(Screen &screen)
         }
     } while (atoi(hora) < 8 || atoi(hora) > 17);
     int hora_inteiro = atoi(hora);
-    if (horario_ocupado(dia_inteiro - 1, hora_inteiro - 8))
+    if (horario_ocupado(dia_inteiro - 1, hora_inteiro - 8, renderer, font))
     {
         char resp;
         std::cout << std::endl
@@ -238,11 +270,12 @@ void Schedule::abre_desmarcacao(Screen &screen)
     }
 }
 
-void Schedule::lista_cliente(Screen &screen)
+void Schedule::lista_cliente(Screen &screen, SDL_Renderer *renderer,
+                             TTF_Font *font)
 {
     char dia[2];
     char *pcliente = 0;
-    screen.clearScreen();
+    screen.clearScreen(renderer);
     screen.moveCursor(1, 1);
     std::cout << std::endl;
     std::cout << "                                    *** AGENDA PARA MARCAÇÃO DE ATENDIMENTO ***                                    ";
@@ -301,13 +334,14 @@ void Schedule::lista_cliente(Screen &screen)
     std::cin.get();
 }
 
-void Schedule::horarios_cliente(Screen &screen)
+void Schedule::horarios_cliente(Screen &screen, SDL_Renderer *renderer,
+                                TTF_Font *font)
 {
-    screen.clearScreen();
+    screen.clearScreen(renderer);
     screen.moveCursor(1, 1);
     char nome[50];
     std::cout << std::endl;
-    std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
+    std::cout << "                                    *** AGENDA PARA MARCAÇÃO DE ATENDIMENTO ***                                    ";
     std::cout << std::endl
               << std::endl;
     std::cout << "                                                HORÁRIOS DE UM CLIENTE                                    ";
@@ -336,12 +370,13 @@ void Schedule::horarios_cliente(Screen &screen)
     std::cin.get();
 }
 
-void Schedule::mapa_horarios(Screen &screen)
+void Schedule::mapa_horarios(Screen &screen, SDL_Renderer *renderer,
+                             TTF_Font *font)
 {
-    screen.clearScreen();
+    screen.clearScreen(renderer);
     screen.moveCursor(1, 1);
     std::cout << std::endl;
-    std::cout << "                                    *** AGENDA PARA DESMARCAÇÃO DE ATENDIMENTO ***                                    ";
+    std::cout << "                                    *** AGENDA PARA MARCAÇÃO DE ATENDIMENTO ***                                    ";
     std::cout << std::endl
               << std::endl;
     std::cout << "                                             MAPA DOS HORÁRIOS OCUPADOS                                    ";
